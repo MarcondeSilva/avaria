@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&#173;</title> <style>
+  /* --- ESTILOS GERAIS --- */
+  body { 
+    font-family: "Segoe UI", Arial, sans-serif; 
+    background: #525659; 
+    padding: 10px; margin: 0;
+    display: flex; justify-content: center;
+  }
+
+  .container { 
+    background: #fff; width: 210mm; min-height: 297mm; 
+    padding: 10mm; box-sizing: border-box;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  /* --- CABEÇALHO COM LOGO E CORES AURI --- */
+  .cabecalho-container {
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid #cc0000;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .logo-img {
+    width: 123px;
+    height: 64px;
+    object-fit: contain;
+    margin-right: 20px;
+  }
+
+  .cabecalho-texto {
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .cabecalho-texto h2 { margin: 0; color: #cc0000; font-size: 22px; text-transform: uppercase; }
+  .cabecalho-texto p { margin: 3px 0; color: #333; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+
+  /* --- CAMPOS DE TOPO --- */
+  .campos-topo { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px; }
+  .campo-item { flex: 1; display: flex; flex-direction: column; }
+  .campo-item label { font-weight: bold; font-size: 11px; margin-bottom: 3px; color: #cc0000; }
+  .campo-item input { border: 1px solid #ccc; padding: 8px; font-weight: bold; font-size: 13px; outline: none; border-radius: 4px; }
+  .campo-item input:focus { border-color: #cc0000; }
+  .campo-item input.erro-cnpj { border: 2px solid #cc0000; background-color: #fff8f8; }
+
+  input[type="text"] { text-transform: uppercase; }
+
+  /* --- TABELA DE ITENS --- */
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: fixed; }
+  th { background: #f2f2f2; font-size: 10px; padding: 8px 2px; border: 1px solid #999; color: #cc0000; }
+  
+  .col-marca { width: 12%; }
+  .col-cod { width: 12%; }     
+  .col-desc { width: 28%; }    
+  .col-qtd { width: 6%; }
+  .col-motivo { width: 15%; }
+  .col-valor { width: 11%; }   
+  .col-total { width: 11%; }
+  .col-acao { width: 5%; } 
+
+  td { border: 1px solid #ccc; height: 32px; }
+  td input { width: 100%; border: none; padding: 5px; font-size: 11px; text-align: center; box-sizing: border-box; background: transparent; }
+  
+  .btn-del { color: #999; border: none; background: none; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; height: 100%; }
+  .btn-del:hover { background: #fee; color: #cc0000; }
+
+  /* --- BARRA FUNCIONAL --- */
+  .barra-funcional {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #cc0000;
+    background: #f9f9f9;
+    padding: 12px 15px;
+    border-radius: 4px;
+  }
+
+  .add { background: #1976d2; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+  .btn-registrar { background: #cc0000; color: #fff; border: none; padding: 12px 30px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+  .btn-registrar:hover { background: #a30000; }
+
+  .total-exibicao { font-size: 15px; color: #cc0000; font-weight: bold; }
+  .total-exibicao input { border: none; font-weight: 900; font-size: 18px; width: 110px; text-align: right; background: transparent; color: #cc0000; outline: none; }
+
+  /* --- FEEDBACKS E MODAL --- */
+  #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+  .spinner { border: 6px solid #f3f3f3; border-top: 6px solid #cc0000; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  #modalSucesso { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; justify-content: center; align-items: center; }
+  .modal-content { background: white; padding: 25px; border-radius: 8px; text-align: center; max-width: 320px; width: 90%; }
+  .protocolo-box { background: #f2f2f2; padding: 12px; border: 2px dashed #cc0000; margin: 15px 0; font-family: monospace; font-weight: bold; font-size: 1.2em; color: #333; }
+  .modal-content button { background: #cc0000; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+
+  /* --- AJUSTES DE IMPRESSÃO --- */
+  @media print {
+    @page { size: portrait; margin: 0; }
+    body { background: white; padding: 0; margin: 0; }
+    .container { box-shadow: none; width: 100%; padding: 15mm; border: none; }
+    .barra-funcional, .btn-del, #loader, #modalSucesso { display: none !important; }
+    .cabecalho-container { border-bottom-color: #000; }
+    .cabecalho-texto h2, .campo-item label, th, .total-exibicao, .total-exibicao input { color: #000 !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+  <div class="spinner"></div>
+  <p style="margin-top: 10px; font-weight: bold; color: #cc0000;">Enviando dados...</p>
+</div>
+
+<div id="modalSucesso">
+  <div class="modal-content">
+    <div style="font-size: 40px; color: #cc0000;">✅</div>
+    <h3 style="margin: 10px 0;">Registro Efetuado!</h3>
+    <div id="exibirProtocolo" class="protocolo-box"></div>
+    <button onclick="fecharModal()">OK / NOVO REGISTRO</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="cabecalho-container">
+    <img src="logo.png" alt="Logo" class="logo-img">
+    <div class="cabecalho-texto">
+      <h2>AURI AUTOPEÇAS</h2>
+      <p>Registro de Entrada - Garantia / Avaria</p>
+    </div>
+  </div>
+  
+  <div class="campos-topo">
+    <div class="campo-item">
+      <label>DATA ENTRADA</label>
+      <input id="dataEntrada" type="date" required>
+    </div>
+    <div class="campo-item">
+      <label>CNPJ DA LOJA</label>
+      <input id="cnpj" type="text" maxlength="18" oninput="lidarCNPJ(this)" placeholder="00.000.000/0000-00">
+    </div>
+    <div class="campo-item">
+      <label>COLABORADOR</label>
+      <input id="colaborador" type="text" placeholder="Nome">
+    </div>
+  </div>
+
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th class="col-marca">MARCA</th>
+        <th class="col-cod">CÓD PEÇA</th>
+        <th class="col-desc">DESCRIÇÃO</th>
+        <th class="col-qtd">QTD</th>
+        <th class="col-motivo">MOTIVO</th>
+        <th class="col-valor">UNIT. (R$)</th>
+        <th class="col-total">TOTAL (R$)</th>
+        <th class="col-acao"></th> 
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="text" required></td>
+        <td><input type="text" required></td>
+        <td><input type="text" style="text-align: left;" required></td>
+        <td><input type="number" min="1" oninput="calcular(this)" required></td>
+        <td><input type="text" required></td>
+        <td><input type="text" class="valor-field" oninput="validarMoeda(this)" onblur="formatarMoeda(this)" placeholder="0,00" required></td>
+        <td><input type="text" class="valor-field" readonly tabindex="-1" value="0,00"></td>
+        <td><button type="button" class="btn-del" onclick="removerEstaLinha(this)">×</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="barra-funcional">
+    <div class="secao-add">
+      <button onclick="adicionarLinha()" class="add">➕ INSERIR LINHA</button>
+    </div>
+    
+    <div class="secao-btn-principal">
+      <button id="btnRegistrar" onclick="registrar()" class="btn-registrar">REGISTRAR ENTRADA</button>
+    </div>
+
+    <div class="secao-total">
+      <div class="total-exibicao">
+        TOTAL: R$ <input id="totalGeral" readonly value="0,00">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxf13nwgCv6gsqzdNaYBz6KqCtm38w6RLzM8VpxVkX5OVCWNhMbFoGptmYlf3-G-aDt/exec";
+
+// --- VALIDAR CNPJ ---
+function validarCNPJ(cnpj) {
+  cnpj = cnpj.replace(/[^\d]+/g, '');
+  if (cnpj == '' || cnpj.length != 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+  let tamanho = cnpj.length - 2;
+  let numeros = cnpj.substring(0, tamanho);
+  let digitos = cnpj.substring(tamanho);
+  let soma = 0; let pos = tamanho - 7;
+  for (let i = tamanho; i >= 1; i--) { soma += numeros.charAt(tamanho - i) * pos--; if (pos < 2) pos = 9; }
+  let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+  if (resultado != digitos.charAt(0)) return false;
+  tamanho = tamanho + 1; numeros = cnpj.substring(0, tamanho); soma = 0; pos = tamanho - 7;
+  for (let i = tamanho; i >= 1; i--) { soma += numeros.charAt(tamanho - i) * pos--; if (pos < 2) pos = 9; }
+  resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+  return resultado == digitos.charAt(1);
+}
+
+function lidarCNPJ(i) {
+  let v = i.value.replace(/\D/g, "");
+  v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+  v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+  v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+  v = v.replace(/(\d{4})(\d)/, "$1-$2");
+  i.value = v;
+  if (v.length === 18) {
+    if (!validarCNPJ(v)) i.classList.add('erro-cnpj');
+    else i.classList.remove('erro-cnpj');
+  } else i.classList.remove('erro-cnpj');
+}
+
+// --- TABELA ---
+function adicionarLinha() {
+  const tbody = document.querySelector("#tabela tbody");
+  const novaLinha = tbody.rows[0].cloneNode(true);
+  novaLinha.querySelectorAll("input").forEach(input => input.value = "");
+  novaLinha.cells[6].querySelector("input").value = "0,00";
+  tbody.appendChild(novaLinha);
+}
+
+function removerEstaLinha(btn) {
+  const tr = btn.closest("tr");
+  const tbody = document.querySelector("#tabela tbody");
+  if (tbody.rows.length > 1) {
+    if (confirm("Deseja excluir esta linha?")) { tr.remove(); calcularTotalGeral(); }
+  } else alert("O formulário deve ter ao menos uma linha.");
+}
+
+function validarMoeda(input) { input.value = input.value.replace(/[^0-9,.]/g, ''); }
+
+function formatarMoeda(input) {
+  let valor = input.value.replace(',', '.');
+  if (valor !== "" && !isNaN(valor)) {
+    input.value = parseFloat(valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+  calcular(input);
+}
+
+function calcular(el) {
+  const tr = el.closest("tr");
+  const qtd = parseFloat(tr.cells[3].querySelector("input").value) || 0;
+  const custoTexto = tr.cells[5].querySelector("input").value.replace(/\./g, '').replace(',', '.');
+  const custo = parseFloat(custoTexto) || 0;
+  tr.cells[6].querySelector("input").value = (qtd * custo).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+  calcularTotalGeral();
+}
+
+function calcularTotalGeral() {
+  let total = 0;
+  document.querySelectorAll("#tabela tbody tr").forEach(tr => {
+    const vTexto = tr.cells[6].querySelector("input").value.replace(/\./g, '').replace(',', '.');
+    total += parseFloat(vTexto) || 0;
+  });
+  document.getElementById("totalGeral").value = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+}
+
+function fecharModal() { location.reload(); }
+
+function gerarProtocolo() {
+  const agora = new Date();
+  const dataRef = agora.getFullYear() + "" + String(agora.getMonth() + 1).padStart(2, '0') + String(agora.getDate()).padStart(2, '0');
+  return `AUR-${dataRef}-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+async function registrar() {
+  const cnpjInput = document.getElementById("cnpj");
+  const colab = document.getElementById("colaborador").value;
+  const dataE = document.getElementById("dataEntrada").value;
+
+  if (!cnpjInput.value || !colab || !dataE) { alert("Preencha o cabeçalho completo."); return; }
+  if (!validarCNPJ(cnpjInput.value)) { alert("O CNPJ informado é inválido!"); return; }
+
+  const protocolo = gerarProtocolo();
+  document.getElementById("exibirProtocolo").innerText = protocolo;
+  document.getElementById("loader").style.display = "flex";
+
+  const itens = [];
+  document.querySelectorAll("#tabela tbody tr").forEach(tr => {
+    const inputs = tr.querySelectorAll("input");
+    if(inputs[1].value) {
+      itens.push({
+        marca: inputs[0].value.toUpperCase(),
+        codpeca: inputs[1].value.toUpperCase(),
+        descricaopeca: inputs[2].value.toUpperCase(),
+        quantidade: inputs[3].value,
+        motivogarantia: inputs[4].value.toUpperCase(),
+        custounitario: inputs[5].value.replace(/\./g, '').replace(',', '.'),
+        valortotal: inputs[6].value.replace(/\./g, '').replace(',', '.')
+      });
+    }
+  });
+
+  if (itens.length === 0) { alert("Adicione ao menos um item válido."); document.getElementById("loader").style.display = "none"; return; }
+
+  const payload = {
+    cnpj: cnpjInput.value, colaborador: colab.toUpperCase(), dataEntrada: dataE,
+    totalgeral: document.getElementById("totalGeral").value.replace(/\./g, '').replace(',', '.'),
+    protocolo, itens
+  };
+
+  try {
+    await fetch(ENDPOINT, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("modalSucesso").style.display = "flex";
+  } catch (err) {
+    document.getElementById("loader").style.display = "none";
+    alert("Erro na conexão: " + err);
+  }
+}
+</script>
+</body>
+</html>
